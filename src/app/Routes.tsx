@@ -17,7 +17,7 @@ import {
 import styled from 'styled-components/native';
 import theme from '../constants/theme';
 import HomeStack from '../screens/Home/HomeStack';
-import RankingsStack from '../screens/Rankings/RankingsStack';
+import RankingsStack from '../screens/Rankings/Rankings';
 
 const Tab = createBottomTabNavigator();
 const screenWidth = Dimensions.get('screen').width;
