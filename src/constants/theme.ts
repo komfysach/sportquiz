@@ -41,6 +41,7 @@ const theme = {
   UrbanistBold: 'Urbanist-Bold',
   UrbanistMedium: 'Urbanist-Medium',
   UrbanistRegular: 'Urbanist-Regular',
+  UrbanistSemiBold: 'Urbanist-SemiBold',
   UrbanistLight: 'Urbanist-Light',
 
   // Font sizes
