@@ -19,6 +19,7 @@ const theme = {
   borderRadius10: '10px',
   borderRadius15: '15px',
   borderRadius20: '20px',
+  borderRadiusFull: '999px',
 
   // Shadow
   shadow: '3px 4px 0px rgba(0, 0, 0, 0.04)',
@@ -27,8 +28,8 @@ const theme = {
   greenBlack: '#1C1E1C',
   purple: '#D992FF',
   blue: '#3333FF',
-  green: '#A0ED5D',
-  lightGreen: '#CCFFCC',
+  green: '#CCFFCC',
+  lightGreen: '#EEFFEE',
   white: '#ffffff',
 
   // Font families (SpaceGrotesk)
