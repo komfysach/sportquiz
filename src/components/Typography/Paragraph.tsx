@@ -1,5 +1,5 @@
 // Components==============
-import theme from 'constants/theme';
+import theme from '../../constants/theme';
 import React from 'react';
 import {TextProps} from 'react-native';
 import styled from 'styled-components/native';
