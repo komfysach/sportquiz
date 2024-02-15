@@ -27,6 +27,7 @@ export default function Category({category}: {category: CategoryType}) {
   const navigation = useNavigation<NavigationProp<QuizParamList>>();
 
   const handleCategoryPress = () => {
+    console.log('handleCategoryPress was called');
     navigation.navigate('Quiz', {id: category.id});
   };
 
@@ -36,7 +37,9 @@ export default function Category({category}: {category: CategoryType}) {
       testID="categories"
       key={category.id}>
       <Image source={category.icon} />
-      <CategoryName>{category.name}</CategoryName>
+      <CategoryName testID={`category-${category.name}`}>
+        {category.name}
+      </CategoryName>
     </CategoryContainer>
   );
 }
