@@ -1,30 +1,33 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import theme from '../../../constants/theme';
-import {H1, H2, H4} from '../../../components/Typography/Headings';
-import Search from '../../../components/UI/Search';
-import Layout from '../../../components/UI/Layout';
+import theme from '../../../../constants/theme';
+import {H1, H2, H4} from '../../../../components/Typography/Headings';
+import Search from '../../../../components/UI/Search';
+import Layout from '../../../../components/UI/Layout';
+import {Dimensions} from 'react-native';
+import Category from './components/Category';
+import {CategoryType} from 'typings/CategoryType';
 
-const sportCategories = [
+const sportCategories: CategoryType[] = [
   {
     id: 1,
     name: 'Football',
-    icon: require('../../../../assets/images/football.png'),
+    icon: require('../../../../../assets/images/football.png'),
   },
   {
     id: 2,
     name: 'Basketball',
-    icon: require('../../../../assets/images/basketball.png'),
+    icon: require('../../../../../assets/images/basketball.png'),
   },
   {
     id: 3,
     name: 'Baseball',
-    icon: require('../../../../assets/images/baseball.png'),
+    icon: require('../../../../../assets/images/baseball.png'),
   },
   {
     id: 4,
     name: 'Rugby',
-    icon: require('../../../../assets/images/rugby.png'),
+    icon: require('../../../../../assets/images/rugby.png'),
   },
 ];
 
@@ -45,30 +48,20 @@ const QuestionWrapper = styled.View``;
 
 const Question = styled(H1)``;
 
+const screenWidth = Dimensions.get('screen').width;
+
 const Categories = styled.View`
   flex-direction: row;
-  gap: ${theme.spacing25};
+  gap: ${theme.spacing20};
   flex-wrap: wrap;
-`;
-
-const CateogryContainer = styled.View`
-  background-color: ${theme.lightGreen};
-  padding: ${theme.spacing10};
-  border-radius: ${theme.borderRadius20};
-  align-items: center;
+  width: ${screenWidth - 40}px;
   justify-content: space-between;
-  gap: ${theme.spacing5};
-`;
-
-const Image = styled.Image`
-  width: 150px;
-  height: 150px;
 `;
 
 export default function Home() {
   return (
     <Layout>
-      <HomeContainer>
+      <HomeContainer testID="home-screen">
         <Top>
           <Intro>Hello</Intro>
           <Name>Sachin Lendis</Name>
@@ -79,10 +72,7 @@ export default function Home() {
         <Search />
         <Categories>
           {sportCategories.map(category => (
-            <CateogryContainer key={category.id}>
-              <Image source={category.icon} />
-              <H4>{category.name}</H4>
-            </CateogryContainer>
+            <Category category={category} key={category.id} />
           ))}
         </Categories>
       </HomeContainer>
