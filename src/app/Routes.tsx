@@ -34,12 +34,16 @@ const HomeWrapper = styled.View<{focused: Boolean}>`
   gap: 5px;
 `;
 
-function getTabBarIcon(route: string, focused: boolean) {
+export function getTabBarIcon(route: string, focused: boolean) {
   if (route === 'home') {
     return (
       <HomeWrapper focused={focused}>
         {focused ? (
-          <HomeIconSolid color={theme.greenBlack} size={20} />
+          <HomeIconSolid
+            testID="home-icon-solid"
+            color={theme.greenBlack}
+            size={20}
+          />
         ) : (
           <HomeIconOutline color={theme.lightGreen} size={20} />
         )}
@@ -51,7 +55,11 @@ function getTabBarIcon(route: string, focused: boolean) {
     return (
       <HomeWrapper focused={focused}>
         {focused ? (
-          <TrophyIconSolid color={theme.greenBlack} size={20} />
+          <TrophyIconSolid
+            testID="trophy-icon-solid"
+            color={theme.greenBlack}
+            size={20}
+          />
         ) : (
           <TrophyIconOutline color={theme.lightGreen} size={20} />
         )}
