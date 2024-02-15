@@ -7,6 +7,9 @@ import Layout from '../../../../components/UI/Layout';
 import {Dimensions} from 'react-native';
 import Category from './components/Category';
 import {CategoryType} from 'typings/CategoryType';
+import {UserIcon} from 'react-native-heroicons/outline';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {HomeParamList} from 'typings/Navigation';
 
 const sportCategories: CategoryType[] = [
   {
@@ -36,7 +39,25 @@ const HomeContainer = styled.View`
   gap: ${theme.spacing20};
 `;
 
-const Top = styled.View``;
+const Top = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: ${theme.spacing20};
+`;
+
+const Left = styled.View``;
+
+const Right = styled.View`
+  align-items: flex-end;
+`;
+
+const ProfileWrapper = styled.TouchableOpacity`
+  background-color: ${theme.greenBlack};
+  padding: ${theme.spacing5};
+  border: 1px solid ${theme.lightGreen};
+  border-radius: ${theme.borderRadiusFull};
+`;
 
 const Intro = styled(H4)`
   font-family: ${theme.SpaceGrotesqueLight};
@@ -59,12 +80,24 @@ const Categories = styled.View`
 `;
 
 export default function Home() {
+  const navigation = useNavigation<NavigationProp<HomeParamList>>();
+
+  const handleProfilePress = () => {
+    navigation.navigate('Profile');
+  };
   return (
     <Layout>
       <HomeContainer testID="home-screen">
         <Top>
-          <Intro>Hello</Intro>
-          <Name>Sachin Lendis</Name>
+          <Left>
+            <Intro>Hello</Intro>
+            <Name>Sachin Lendis</Name>
+          </Left>
+          <Right>
+            <ProfileWrapper onPress={handleProfilePress}>
+              <UserIcon size={30} color={theme.lightGreen} />
+            </ProfileWrapper>
+          </Right>
         </Top>
         <QuestionWrapper>
           <Question>What sport trivia would you like to tackle today?</Question>
