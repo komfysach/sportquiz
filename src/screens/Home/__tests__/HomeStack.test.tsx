@@ -1,7 +1,7 @@
 import React from 'react';
 import {render} from '@testing-library/react-native';
 import {NavigationContainer} from '@react-navigation/native';
-import HomeStack from '../HomeStack'; // replace with the actual path to your HomeStack component
+import HomeStack from '../HomeStack';
 
 describe('HomeStack', () => {
   it('renders the Home screen as the initial route', () => {
