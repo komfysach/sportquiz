@@ -1,10 +1,12 @@
+import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {H4} from '../../../../../components/Typography/Headings';
 import theme from '../../../../../constants/theme';
 import React from 'react';
 import styled from 'styled-components/native';
 import {CategoryType} from 'typings/CategoryType';
+import {QuizParamList} from 'typings/Navigation';
 
-const CategoryContainer = styled.View`
+const CategoryContainer = styled.TouchableOpacity`
   background-color: ${theme.lightGreen};
   padding: ${theme.spacing15};
   border-radius: ${theme.borderRadius20};
@@ -17,11 +19,24 @@ const Image = styled.Image`
   height: 100px;
 `;
 
+const CategoryName = styled(H4)`
+  color: ${theme.greenBlack};
+`;
+
 export default function Category({category}: {category: CategoryType}) {
+  const navigation = useNavigation<NavigationProp<QuizParamList>>();
+
+  const handleCategoryPress = () => {
+    navigation.navigate('Quiz', {id: category.id});
+  };
+
   return (
-    <CategoryContainer testID="categories" key={category.id}>
+    <CategoryContainer
+      onPress={handleCategoryPress}
+      testID="categories"
+      key={category.id}>
       <Image source={category.icon} />
-      <H4>{category.name}</H4>
+      <CategoryName>{category.name}</CategoryName>
     </CategoryContainer>
   );
 }
