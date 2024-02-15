@@ -10,7 +10,7 @@ const SafeArea = styled(SafeAreaView)`
 export default function App() {
   return (
     <>
-      <SafeArea>
+      <SafeArea testID="safe-area">
         <Routes />
       </SafeArea>
     </>
