@@ -1,10 +1,10 @@
 import {View, Text} from 'react-native';
 import React from 'react';
 
-export default function Baseball() {
+export default function Quiz() {
   return (
     <View>
-      <Text>Baseball</Text>
+      <Text>Quiz</Text>
     </View>
   );
 }
