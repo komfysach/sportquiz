@@ -20,6 +20,20 @@ export const quizzes = [
               // More questions...
             ],
           },
+          {
+            section: 2,
+            questions: [
+              {
+                question: 'Question 1',
+                answers: [
+                  {answer: 'Answer 1', isCorrect: false, points: 0},
+                  {answer: 'Answer 2', isCorrect: true, points: 10},
+                  {answer: 'Answer 3', isCorrect: false, points: 0},
+                ],
+              },
+              // More questions...
+            ],
+          },
           // More sections...
         ],
       },
