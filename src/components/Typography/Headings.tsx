@@ -5,7 +5,7 @@ import theme from '../../constants/theme';
 import {HeadingTypes} from '../../typings/HeadingTypes';
 
 const Heading = styled.Text<{headingType: HeadingTypes}>`
-  color: ${theme.greenBlack};
+  color: ${theme.lightGreen};
   font-family: ${({headingType}) =>
     headingType === 'H4'
       ? theme.SpaceGrotesqueMedium

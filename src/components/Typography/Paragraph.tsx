@@ -13,7 +13,7 @@ interface TextPropsWithOpacities extends React.PropsWithChildren<TextProps> {
 }
 
 const Text = styled.Text<{paragraphType: ParagraphTypes; opacity: Opacities}>`
-  color: ${theme.greenBlack};
+  color: ${theme.lightGreen};
   font-family: ${theme.SpaceGrotesqueRegular};
   opacity: ${({opacity}) => {
     switch (opacity) {
