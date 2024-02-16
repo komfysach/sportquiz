@@ -12,9 +12,9 @@ export const quizzes = [
               {
                 question: 'Question 1',
                 answers: [
-                  {answer: 'Answer 1', isCorrect: false, points: 0},
-                  {answer: 'Answer 2', isCorrect: true, points: 10},
-                  {answer: 'Answer 3', isCorrect: false, points: 0},
+                  {id: 1, answer: 'Answer 1', isCorrect: false, points: 0},
+                  {id: 2, answer: 'Answer 2', isCorrect: true, points: 10},
+                  {id: 3, answer: 'Answer 3', isCorrect: false, points: 0},
                 ],
               },
               // More questions...
@@ -26,9 +26,9 @@ export const quizzes = [
               {
                 question: 'Question 1',
                 answers: [
-                  {answer: 'Answer 1', isCorrect: false, points: 0},
-                  {answer: 'Answer 2', isCorrect: true, points: 10},
-                  {answer: 'Answer 3', isCorrect: false, points: 0},
+                  {id: 1, answer: 'Answer 1', isCorrect: false, points: 0},
+                  {id: 2, answer: 'Answer 2', isCorrect: true, points: 10},
+                  {id: 3, answer: 'Answer 3', isCorrect: false, points: 0},
                 ],
               },
               // More questions...
@@ -46,9 +46,9 @@ export const quizzes = [
               {
                 question: 'Question 1',
                 answers: [
-                  {answer: 'Answer 1', isCorrect: false, points: 0},
-                  {answer: 'Answer 2', isCorrect: true, points: 10},
-                  {answer: 'Answer 3', isCorrect: false, points: 0},
+                  {id: 1, answer: 'Answer 1', isCorrect: false, points: 0},
+                  {id: 2, answer: 'Answer 2', isCorrect: true, points: 10},
+                  {id: 3, answer: 'Answer 3', isCorrect: false, points: 0},
                 ],
               },
               // More questions...
@@ -66,9 +66,9 @@ export const quizzes = [
               {
                 question: 'Question 1',
                 answers: [
-                  {answer: 'Answer 1', isCorrect: false, points: 0},
-                  {answer: 'Answer 2', isCorrect: true, points: 10},
-                  {answer: 'Answer 3', isCorrect: false, points: 0},
+                  {id: 1, answer: 'Answer 1', isCorrect: false, points: 0},
+                  {id: 2, answer: 'Answer 2', isCorrect: true, points: 10},
+                  {id: 3, answer: 'Answer 3', isCorrect: false, points: 0},
                 ],
               },
               // More questions...
@@ -93,9 +93,9 @@ export const quizzes = [
               {
                 question: 'Question 1',
                 answers: [
-                  {answer: 'Answer 1', isCorrect: false, points: 0},
-                  {answer: 'Answer 2', isCorrect: true, points: 10},
-                  {answer: 'Answer 3', isCorrect: false, points: 0},
+                  {id: 1, answer: 'Answer 1', isCorrect: false, points: 0},
+                  {id: 2, answer: 'Answer 2', isCorrect: true, points: 10},
+                  {id: 3, answer: 'Answer 3', isCorrect: false, points: 0},
                 ],
               },
               // More questions...
@@ -120,9 +120,9 @@ export const quizzes = [
               {
                 question: 'Question 1',
                 answers: [
-                  {answer: 'Answer 1', isCorrect: false, points: 0},
-                  {answer: 'Answer 2', isCorrect: true, points: 10},
-                  {answer: 'Answer 3', isCorrect: false, points: 0},
+                  {id: 1, answer: 'Answer 1', isCorrect: false, points: 0},
+                  {id: 2, answer: 'Answer 2', isCorrect: true, points: 10},
+                  {id: 3, answer: 'Answer 3', isCorrect: false, points: 0},
                 ],
               },
               // More questions...
@@ -147,9 +147,9 @@ export const quizzes = [
               {
                 question: 'Question 1',
                 answers: [
-                  {answer: 'Answer 1', isCorrect: false, points: 0},
-                  {answer: 'Answer 2', isCorrect: true, points: 10},
-                  {answer: 'Answer 3', isCorrect: false, points: 0},
+                  {id: 1, answer: 'Answer 1', isCorrect: false, points: 0},
+                  {id: 2, answer: 'Answer 2', isCorrect: true, points: 10},
+                  {id: 3, answer: 'Answer 3', isCorrect: false, points: 0},
                 ],
               },
               // More questions...
