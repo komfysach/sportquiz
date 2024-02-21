@@ -20,12 +20,14 @@ const Label = styled(ParagraphLarge)`
 export default function Button({
   label,
   icon,
+  onPress,
 }: {
   label: string;
   icon?: React.ReactNode;
+  onPress: () => void;
 }) {
   return (
-    <ButtonWrapper>
+    <ButtonWrapper onPress={onPress}>
       <Label>{label}</Label>
       {icon && icon}
     </ButtonWrapper>
