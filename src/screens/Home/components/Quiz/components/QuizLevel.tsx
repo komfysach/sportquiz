@@ -6,7 +6,11 @@ import {quizzes} from '../../../../../constants/quiz';
 import {ParagraphLarge} from '../../../../../components/Typography/Paragraph';
 import theme from '../../../../../constants/theme';
 import Button from '../../../../../components/UI/Button';
-import {ArrowRightIcon} from 'react-native-heroicons/outline';
+import {
+  ArrowRightIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+} from 'react-native-heroicons/outline';
 
 const LevelContainer = styled.View`
   gap: ${theme.spacing20};
@@ -31,23 +35,26 @@ const Question = styled(H2)``;
 const AnswerWrapper = styled.TouchableOpacity<{isCorrect?: Boolean}>`
   padding: ${theme.spacing15};
   background-color: ${({isCorrect}) =>
-    isCorrect === undefined ? theme.lightGreen : 'transparent'};
+    isCorrect === undefined
+      ? 'transparent'
+      : isCorrect
+      ? theme.green
+      : theme.purple};
   border: ${({isCorrect}) =>
     isCorrect
       ? `2px solid ${theme.green}`
       : isCorrect === undefined
-      ? 'none'
+      ? `1px solid ${theme.lightGreen}`
       : `2px solid ${theme.purple}`};
   border-radius: ${theme.borderRadius15};
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 const Answer = styled(ParagraphLarge)<{isCorrect?: Boolean}>`
   color: ${({isCorrect}) =>
-    isCorrect
-      ? theme.green
-      : isCorrect === undefined
-      ? theme.greenBlack
-      : theme.purple};
+    isCorrect === undefined ? theme.lightGreen : theme.greenBlack};
 `;
 
 const ButtonContainer = styled.View`
@@ -87,33 +94,41 @@ export default function QuizLevel({route}: {route: any}) {
     points: number,
     answerId: number,
   ) => {
-    // Add the answer ID and its correctness to answeredQuestions
-    setAnsweredQuestions({
-      ...answeredQuestions,
-      [answerId]: isCorrect,
-    });
+    setAnsweredQuestions(prevState => {
+      // Add the answer ID and its correctness to answeredQuestions
+      const newAnsweredQuestions = {
+        ...prevState,
+        [answerId]: isCorrect,
+      };
 
-    // Calculate the number of answered questions
-    const numAnsweredQuestions = Object.keys(answeredQuestions).length;
-    if (
-      isCorrect &&
-      (numAnsweredQuestions === 1 || numAnsweredQuestions === 2)
-    ) {
-      if (numAnsweredQuestions === 1) {
-        setUserPoints(userPoints + points);
+      console.log('clicked answer', isCorrect, points, answerId);
+      console.log('answeredQuestions', answeredQuestions);
+
+      // Calculate the number of answered questions based on the new state value
+      const numAnsweredQuestions = Object.keys(newAnsweredQuestions).length;
+      if (
+        isCorrect &&
+        (numAnsweredQuestions === 1 || numAnsweredQuestions === 2)
+      ) {
+        if (numAnsweredQuestions === 1) {
+          setUserPoints(userPoints + points);
+        }
+        if (numAnsweredQuestions === 2) {
+          setUserPoints(userPoints + points / 2);
+        }
+        setMessage('Well done! Keep going!');
       }
-      if (numAnsweredQuestions === 2) {
-        setUserPoints(userPoints + points / 2);
+      if (!isCorrect && numAnsweredQuestions === 1) {
+        setMessage('Aaah too bad! Try again!');
       }
-      setMessage('Well done! Keep going!');
-    }
-    if (!isCorrect && numAnsweredQuestions === 1) {
-      setMessage('Aaah too bad! Try again!');
-    }
-    if (!isCorrect && numAnsweredQuestions === 2) {
-      setMessage('Sorry, you lost!');
-    }
+      if (!isCorrect && numAnsweredQuestions === 2) {
+        setMessage('Sorry, you lost!');
+      }
+      return newAnsweredQuestions;
+    });
   };
+
+  console.log('answeredQuestions', answeredQuestions);
 
   return (
     <Layout backLink>
@@ -134,14 +149,19 @@ export default function QuizLevel({route}: {route: any}) {
                 {question.answers.map((answer, answerIndex) => (
                   <AnswerWrapper
                     isCorrect={answeredQuestions[answer.id]}
+                    onPress={() => {
+                      console.log('clicked answer', answer);
+                      handleAnswer(answer.isCorrect, answer.points, answer.id);
+                    }}
                     key={answerIndex}>
-                    <Answer
-                      isCorrect={answeredQuestions[answer.id]}
-                      onPress={() =>
-                        handleAnswer(answer.isCorrect, answer.points, answer.id)
-                      }>
+                    <Answer isCorrect={answeredQuestions[answer.id]}>
                       {answer.answer}
                     </Answer>
+                    {!answer.isCorrect ? (
+                      <XCircleIcon color={theme.greenBlack} size={25} />
+                    ) : answer.isCorrect ? (
+                      <CheckCircleIcon color={theme.greenBlack} size={25} />
+                    ) : null}
                   </AnswerWrapper>
                 ))}
               </React.Fragment>
@@ -154,6 +174,9 @@ export default function QuizLevel({route}: {route: any}) {
           </FeedbackContainer>
           <ButtonContainer>
             <Button
+              onPress={() => {
+                setCurrentSection(currentSection + 1);
+              }}
               label="Next"
               icon={<ArrowRightIcon size={20} color={theme.greenBlack} />}
             />
