@@ -12,6 +12,7 @@ const CategoryContainer = styled.TouchableOpacity`
   border-radius: ${theme.borderRadius20};
   align-items: center;
   gap: ${theme.spacing5};
+  width: 45%;
 `;
 
 const Image = styled.Image`

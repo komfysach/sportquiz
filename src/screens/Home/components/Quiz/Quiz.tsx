@@ -1,12 +1,12 @@
+import {NavigationProp, useNavigation} from '@react-navigation/native';
 import React, {useState} from 'react';
+import {LockClosedIcon} from 'react-native-heroicons/solid';
 import styled from 'styled-components/native';
-import {H1, H2} from '../../../../components/Typography/Headings';
+import {QuizLevelParamList} from 'typings/Navigation';
+import {H1, H3} from '../../../../components/Typography/Headings';
 import Layout from '../../../../components/UI/Layout';
 import {quizzes} from '../../../../constants/quiz';
 import theme from '../../../../constants/theme';
-import {LockClosedIcon} from 'react-native-heroicons/solid';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {QuizLevelParamList} from 'typings/Navigation';
 
 const QuizContainer = styled.View`
   gap: ${theme.spacing20};
@@ -27,7 +27,7 @@ const Level = styled.TouchableOpacity<{notCompleted: Boolean}>`
   border-radius: ${theme.borderRadius20};
 `;
 
-const LevelHeading = styled(H2)`
+const LevelHeading = styled(H3)`
   color: ${theme.greenBlack};
 `;
 
@@ -40,9 +40,11 @@ const LockIcon = styled(LockClosedIcon)`
 export default function Quiz({route}: {route: any}) {
   const {id} = route.params;
   const quiz = quizzes.find(quizId => quizId.id === id);
-  const [completedLevels, setCompletedLevels] = useState([1]);
+  const [completedLevels, setCompletedLevels] = useState<Array<string>>([
+    'Simple - These are just tap ins',
+  ]);
   const navigation = useNavigation<NavigationProp<QuizLevelParamList>>();
-  const handleLevelPress = (level: number) => {
+  const handleLevelPress = (level: string) => {
     if (completedLevels.includes(level)) {
       navigation.navigate('QuizLevel', {id: id, level: level});
     } else {

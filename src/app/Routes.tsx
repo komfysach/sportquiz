@@ -21,13 +21,13 @@ const screenWidth = Dimensions.get('screen').width;
 const HomeWrapper = styled.View<{focused: Boolean}>`
   background-color: ${({focused}) =>
     focused ? theme.greenBlack : 'transparent'};
-  padding: 10px;
-  border-radius: 999px;
-  margin-top: 10px;
+  padding: ${theme.spacing10};
+  border-radius: ${theme.borderRadiusFull};
+  margin-top: ${theme.spacing10};
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: ${theme.spacing5};
 `;
 
 export function getTabBarIcon(route: string, focused: boolean) {

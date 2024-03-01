@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Layout from '../../../../../components/UI/Layout';
 import styled from 'styled-components/native';
 import {H1, H2, H3} from '../../../../../components/Typography/Headings';
@@ -7,6 +7,7 @@ import {ParagraphLarge} from '../../../../../components/Typography/Paragraph';
 import theme from '../../../../../constants/theme';
 import Button from '../../../../../components/UI/Button';
 import {
+  ArrowPathIcon,
   ArrowRightIcon,
   CheckCircleIcon,
   XCircleIcon,
@@ -18,7 +19,11 @@ const LevelContainer = styled.View`
 
 const Heading = styled(H1)``;
 
-const PointsWrapper = styled.View``;
+const PointsWrapper = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;
 
 const Points = styled(H3)``;
 
@@ -76,6 +81,12 @@ const Bottom = styled.View`
   align-items: center;
 `;
 
+const ReplayWrapper = styled.TouchableOpacity`
+  background-color: ${theme.lightGreen};
+  padding: ${theme.spacing15};
+  border-radius: ${theme.borderRadiusFull};
+`;
+
 export default function QuizLevel({route}: {route: any}) {
   const {id, level} = route.params;
 
@@ -85,9 +96,23 @@ export default function QuizLevel({route}: {route: any}) {
   const [answeredQuestions, setAnsweredQuestions] = useState<{
     [id: string]: boolean;
   }>({});
+  const [shuffledAnswers, setShuffledAnswers] = useState<any[]>([]);
+  const [replayLevel, setReplayLevel] = useState(false);
 
   const quiz = quizzes.find(quizId => quizId.id === id);
   const levelData = quiz?.levels.find(lvl => lvl.level === level);
+
+  function shuffleArray(array: any[]) {
+    const shuffledArray = [...array];
+    for (let i = shuffledArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledArray[i], shuffledArray[j]] = [
+        shuffledArray[j],
+        shuffledArray[i],
+      ];
+    }
+    return shuffledArray;
+  }
 
   const handleAnswer = (
     isCorrect: boolean,
@@ -100,9 +125,6 @@ export default function QuizLevel({route}: {route: any}) {
         ...prevState,
         [answerId]: isCorrect,
       };
-
-      console.log('clicked answer', isCorrect, points, answerId);
-      console.log('answeredQuestions', answeredQuestions);
 
       // Calculate the number of answered questions based on the new state value
       const numAnsweredQuestions = Object.keys(newAnsweredQuestions).length;
@@ -123,21 +145,40 @@ export default function QuizLevel({route}: {route: any}) {
       }
       if (!isCorrect && numAnsweredQuestions === 2) {
         setMessage('Sorry, you lost!');
+        setReplayLevel(true);
       }
       return newAnsweredQuestions;
     });
   };
 
-  console.log('answeredQuestions', answeredQuestions);
+  useEffect(() => {
+    setAnsweredQuestions({});
+    setMessage('');
+    setShuffledAnswers(
+      shuffleArray(
+        levelData?.sections[currentSection].questions[0].answers || [],
+      ),
+    );
+  }, [currentSection, levelData?.sections]);
+
+  const resetLevel = () => {
+    setUserPoints(0);
+    setCurrentSection(0);
+    setReplayLevel(false);
+    setAnsweredQuestions({});
+  };
 
   return (
     <Layout backLink>
       <LevelContainer>
-        <Heading>
-          {quiz?.sport} - Level {level}
-        </Heading>
+        <Heading>{level}</Heading>
         <PointsWrapper>
           <Points>Your score: {userPoints}</Points>
+          {replayLevel && (
+            <ReplayWrapper onPress={resetLevel}>
+              <ArrowPathIcon size={25} color={theme.greenBlack} />
+            </ReplayWrapper>
+          )}
         </PointsWrapper>
         <SectionWrapper>
           {levelData?.sections[currentSection].questions.map(
@@ -146,11 +187,10 @@ export default function QuizLevel({route}: {route: any}) {
                 <QuestionWrapper>
                   <Question>{question.question}</Question>
                 </QuestionWrapper>
-                {question.answers.map((answer, answerIndex) => (
+                {shuffledAnswers.map((answer, answerIndex) => (
                   <AnswerWrapper
                     isCorrect={answeredQuestions[answer.id]}
                     onPress={() => {
-                      console.log('clicked answer', answer);
                       handleAnswer(answer.isCorrect, answer.points, answer.id);
                     }}
                     key={answerIndex}>
@@ -174,6 +214,7 @@ export default function QuizLevel({route}: {route: any}) {
           </FeedbackContainer>
           <ButtonContainer>
             <Button
+              inActive={replayLevel}
               onPress={() => {
                 setCurrentSection(currentSection + 1);
               }}
