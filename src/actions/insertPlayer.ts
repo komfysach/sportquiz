@@ -7,13 +7,14 @@ export const insertPlayer = async ({
   playerData: PlayerDataType;
 }) => {
   try {
-    const {data, error} = await supabase.from('Users').insert(playerData);
+    const {data, error} = await supabase.from('players').insert(playerData);
+
     if (error) {
       console.error('Error adding player:', error);
-      // Handle error appropriately (e.g., display an error message to the user)
+      // Handle error appropriately
     } else {
       console.log('Player added successfully:', data);
-      // Handle success (e.g., show a confirmation message or redirect the user)
+      // Handle success
     }
   } catch (error) {
     console.error('Unexpected error:', error);
