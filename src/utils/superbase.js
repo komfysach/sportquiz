@@ -1,9 +1,9 @@
 import 'react-native-url-polyfill/auto';
 import {createClient} from '@supabase/supabase-js';
-import Config from 'react-native-config';
+import {SUPABASE_URL, SUPABASE_ANON_KEY} from '@env';
 
-const supabaseUrl = Config.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = Config.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = SUPABASE_URL;
+const supabaseAnonKey = SUPABASE_ANON_KEY;
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
