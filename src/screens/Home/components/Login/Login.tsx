@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, {useContext, useEffect, useState} from 'react';
 import styled from 'styled-components/native';
 import {H1} from '../../../../components/Typography/Headings';
 import {TextInput} from 'react-native';
@@ -8,6 +9,9 @@ import Button from '../../../../components/UI/Button';
 import {HomeParamList} from 'typings/Navigation';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {ParagraphSmall} from '../../../../components/Typography/Paragraph';
+import {insertPlayer} from '../../../../actions/insertPlayer';
+import {getPlayers} from '../../../../actions/getPlayers';
+import {AppContext} from '../../../../context/AppContext';
 
 const NameInputContainer = styled.View`
   flex: 1;
@@ -57,10 +61,49 @@ const Info = styled(ParagraphSmall)`
 `;
 
 export default function Login() {
+  const [formData, setFormData] = useState({
+    name: '',
+    password: '',
+  });
   const navigation = useNavigation<NavigationProp<HomeParamList>>();
-  const login = () => {
-    console.log('Login was called');
-    navigation.navigate('Home');
+  const {setPlayers, setUser, players} = useContext(AppContext);
+
+  useEffect(() => {
+    getPlayers().then(data => {
+      if (data) {
+        setPlayers(data);
+        console.log('Players:', data);
+      }
+    });
+  }, []);
+
+  const login = async () => {
+    try {
+      if (!players) {
+        console.error('Error fetching players');
+        return;
+      }
+
+      const existingPlayer = players.find(
+        player =>
+          player.name === formData.name &&
+          player.password === formData.password,
+      );
+
+      if (!existingPlayer) {
+        console.log('Inserting player:', formData);
+        await insertPlayer({playerData: formData});
+        setUser(formData);
+      } else {
+        console.log('Existing player:', existingPlayer);
+        setUser(existingPlayer);
+      }
+
+      navigation.navigate('Home');
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      // Handle unexpected errors
+    }
   };
   return (
     <Layout>
@@ -69,6 +112,7 @@ export default function Login() {
           <Heading>What is your name?</Heading>
           <InputName
             placeholder="Enter your name"
+            onChangeText={text => setFormData({...formData, name: text})}
             testID="name-input"
             placeholderTextColor={theme.lightGreen}
             inputMode="text"
@@ -76,6 +120,7 @@ export default function Login() {
           <InputPassword
             placeholder="Enter your password"
             testID="password-input"
+            onChangeText={text => setFormData({...formData, password: text})}
             placeholderTextColor={theme.lightGreen}
             secureTextEntry
           />
