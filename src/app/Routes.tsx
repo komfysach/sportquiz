@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {NavigationContainer} from '@react-navigation/native';
-import React from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {Dimensions} from 'react-native';
 import {
   HomeIcon as HomeIconOutline,
@@ -14,6 +15,9 @@ import styled from 'styled-components/native';
 import theme from '../constants/theme';
 import HomeStack from '../screens/Home/HomeStack';
 import RankingsStack from '../screens/Rankings/Rankings';
+import {AppContext} from '../context/AppContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {getPlayerByToken} from '../actions/getPlayerByToken';
 
 const Tab = createBottomTabNavigator();
 const screenWidth = Dimensions.get('screen').width;
@@ -67,7 +71,7 @@ export function getTabBarIcon(route: string, focused: boolean) {
   return null;
 }
 
-const Text = styled.Text<{focused: Boolean}>`
+const Text = styled.Text<{focused?: Boolean}>`
   color: ${({focused}) => (focused ? theme.lightGreen : theme.greenBlack)};
   font-size: ${theme.Paragraph12};
   font-family: ${theme.UrbanistSemiBold};
@@ -75,31 +79,75 @@ const Text = styled.Text<{focused: Boolean}>`
 `;
 
 export default function Routes() {
+  const {user, setUser, setIsFinishedOnboarding} = useContext(AppContext);
+  const [loading, setLoading] = useState(true);
+
+  const setToken = async (username?: string, password?: string) => {
+    const token = `${username}:${password}`;
+    try {
+      await AsyncStorage.setItem('@storage_Key', token);
+    } catch (e) {
+      console.error('Error storing token:', e);
+    }
+  };
+
+  const getToken = async () => {
+    try {
+      const value = await AsyncStorage.getItem('@storage_Key');
+      if (value !== null) {
+        setIsFinishedOnboarding(true);
+        getPlayerByToken(value).then(data => {
+          if (data) {
+            setUser(data);
+          }
+        });
+      }
+    } catch (e) {
+      console.error('Error getting token:', e);
+    }
+  };
+
+  useEffect(() => {
+    if (user !== null) {
+      setToken(user?.name, user?.password);
+    }
+    getToken();
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  }, []);
+
   return (
-    <NavigationContainer>
-      <Tab.Navigator
-        screenOptions={({route}) => ({
-          headerShown: false,
-          tabBarIcon: ({focused}) => getTabBarIcon(route.name, focused),
-          tabBarLabel: () => null,
-          tabBarStyle: {
-            width: screenWidth - 100, // set width to screen width
-            height: 70,
-            paddingLeft: 7,
-            paddingRight: 7,
-            paddingBottom: 8,
-            borderRadius: 999, // add border radius
-            position: 'absolute', // position it absolutely
-            bottom: 10, // lift it up slightly from the bottom
-            left: 50, // align it to the left
-            right: 50, // align it to the right
-            backgroundColor: '#EEFFEE',
-          },
-        })}
-        initialRouteName="home">
-        <Tab.Screen name="home" component={HomeStack} />
-        <Tab.Screen name="rankings" component={RankingsStack} />
-      </Tab.Navigator>
-    </NavigationContainer>
+    <>
+      {loading ? (
+        <Text>Loading...</Text>
+      ) : (
+        <NavigationContainer>
+          <Tab.Navigator
+            screenOptions={({route}) => ({
+              headerShown: false,
+              tabBarIcon: ({focused}) => getTabBarIcon(route.name, focused),
+              tabBarLabel: () => null,
+              tabBarStyle: {
+                width: screenWidth - 100, // set width to screen width
+                height: 70,
+                paddingLeft: 7,
+                paddingRight: 7,
+                paddingBottom: 8,
+                borderRadius: 999, // add border radius
+                position: 'absolute', // position it absolutely
+                bottom: 10, // lift it up slightly from the bottom
+                left: 50, // align it to the left
+                right: 50, // align it to the right
+                backgroundColor: '#EEFFEE',
+              },
+            })}
+            initialRouteName="home">
+            <Tab.Screen name="home" component={HomeStack} />
+            <Tab.Screen name="rankings" component={RankingsStack} />
+          </Tab.Navigator>
+        </NavigationContainer>
+      )}
+    </>
   );
 }
