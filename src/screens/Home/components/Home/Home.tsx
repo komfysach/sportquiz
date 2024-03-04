@@ -1,38 +1,17 @@
-import React from 'react';
-import styled from 'styled-components/native';
-import theme from '../../../../constants/theme';
-import {H1, H2, H4} from '../../../../components/Typography/Headings';
-import Search from '../../../../components/UI/Search';
-import Layout from '../../../../components/UI/Layout';
-import {Dimensions} from 'react-native';
-import Category from './components/Category';
-import {CategoryType} from 'typings/CategoryType';
-import {UserIcon} from 'react-native-heroicons/outline';
+/* eslint-disable react-hooks/exhaustive-deps */
 import {NavigationProp, useNavigation} from '@react-navigation/native';
+import React, {useContext, useEffect} from 'react';
+import {Dimensions} from 'react-native';
+import {UserIcon} from 'react-native-heroicons/outline';
+import styled from 'styled-components/native';
 import {HomeParamList} from 'typings/Navigation';
-
-const sportCategories: CategoryType[] = [
-  {
-    id: 1,
-    name: 'Football',
-    icon: require('../../../../../assets/images/football.png'),
-  },
-  {
-    id: 2,
-    name: 'Basketball',
-    icon: require('../../../../../assets/images/basketball.png'),
-  },
-  {
-    id: 3,
-    name: 'Baseball',
-    icon: require('../../../../../assets/images/baseball.png'),
-  },
-  {
-    id: 4,
-    name: 'Rugby',
-    icon: require('../../../../../assets/images/rugby.png'),
-  },
-];
+import {getSports} from '../../../../actions/getSportCategories';
+import {H1, H2, H4} from '../../../../components/Typography/Headings';
+import Layout from '../../../../components/UI/Layout';
+import Search from '../../../../components/UI/Search';
+import theme from '../../../../constants/theme';
+import {AppContext} from '../../../../context/AppContext';
+import Category from './components/Category';
 
 const HomeContainer = styled.View`
   flex: 1;
@@ -81,6 +60,14 @@ const Categories = styled.View`
 
 export default function Home() {
   const navigation = useNavigation<NavigationProp<HomeParamList>>();
+  const {sports, setSports, user} = useContext(AppContext);
+  useEffect(() => {
+    getSports().then(data => {
+      if (data) {
+        setSports(data);
+      }
+    });
+  }, []);
 
   const handleProfilePress = () => {
     navigation.navigate('Profile');
@@ -91,7 +78,7 @@ export default function Home() {
         <Top>
           <Left>
             <Intro>Hello</Intro>
-            <Name>Sachin Lendis</Name>
+            <Name>{user?.name}</Name>
           </Left>
           <Right>
             <ProfileWrapper onPress={handleProfilePress}>
@@ -104,8 +91,8 @@ export default function Home() {
         </QuestionWrapper>
         <Search />
         <Categories>
-          {sportCategories.map(category => (
-            <Category category={category} key={category.id} />
+          {sports?.map((category, id) => (
+            <Category category={category} key={id} />
           ))}
         </Categories>
       </HomeContainer>
