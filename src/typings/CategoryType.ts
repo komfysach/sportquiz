@@ -1,5 +1,5 @@
 export type CategoryType = {
-  id: number;
-  name: string;
-  icon: any;
+  sport_id: number;
+  sport_name: string;
+  image: any;
 };
