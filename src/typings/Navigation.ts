@@ -22,8 +22,8 @@ export type QuizParamList = {
 
 export type QuizLevelParamList = {
   QuizLevel: {
-    id: number;
-    level: string;
+    sport: number;
+    level: number;
   };
 };
 
