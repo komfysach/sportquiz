@@ -1,4 +1,5 @@
-import React, {useEffect, useState} from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, {useContext, useEffect, useState} from 'react';
 import Layout from '../../../../../components/UI/Layout';
 import styled from 'styled-components/native';
 import {H1, H2, H3} from '../../../../../components/Typography/Headings';
@@ -12,6 +13,8 @@ import {
   CheckCircleIcon,
   XCircleIcon,
 } from 'react-native-heroicons/outline';
+import {AppContext} from '../../../../../context/AppContext';
+import {getQuestionsWithId} from '../../../../../actions/getQuestionsWithId';
 
 const LevelContainer = styled.View`
   gap: ${theme.spacing20};
@@ -88,8 +91,9 @@ const ReplayWrapper = styled.TouchableOpacity`
 `;
 
 export default function QuizLevel({route}: {route: any}) {
-  const {id, level} = route.params;
-
+  const {sport, level} = route.params;
+  console.log('id', sport);
+  console.log('level', level);
   const [userPoints, setUserPoints] = useState(0);
   const [message, setMessage] = useState('');
   const [currentSection, setCurrentSection] = useState(0);
@@ -98,9 +102,16 @@ export default function QuizLevel({route}: {route: any}) {
   }>({});
   const [shuffledAnswers, setShuffledAnswers] = useState<any[]>([]);
   const [replayLevel, setReplayLevel] = useState(false);
+  const [quiz, setQuiz] = useState<any>([]);
 
-  const quiz = quizzes.find(quizId => quizId.id === id);
-  const levelData = quiz?.levels.find(lvl => lvl.level === level);
+  useEffect(() => {
+    getQuestionsWithId(sport, level).then(data => {
+      if (data) {
+        setQuiz(data);
+        console.log('Quiz:', data);
+      }
+    });
+  }, []);
 
   function shuffleArray(array: any[]) {
     const shuffledArray = [...array];
@@ -154,12 +165,12 @@ export default function QuizLevel({route}: {route: any}) {
   useEffect(() => {
     setAnsweredQuestions({});
     setMessage('');
-    setShuffledAnswers(
-      shuffleArray(
-        levelData?.sections[currentSection].questions[0].answers || [],
-      ),
-    );
-  }, [currentSection, levelData?.sections]);
+    // setShuffledAnswers(
+    //   shuffleArray(
+    //     levelData?.sections[currentSection].questions[0].answers || [],
+    //   ),
+    // );
+  }, [currentSection]);
 
   const resetLevel = () => {
     setUserPoints(0);
@@ -180,7 +191,7 @@ export default function QuizLevel({route}: {route: any}) {
             </ReplayWrapper>
           )}
         </PointsWrapper>
-        <SectionWrapper>
+        {/* <SectionWrapper>
           {levelData?.sections[currentSection].questions.map(
             (question, questionIndex) => (
               <React.Fragment key={questionIndex}>
@@ -207,7 +218,7 @@ export default function QuizLevel({route}: {route: any}) {
               </React.Fragment>
             ),
           )}
-        </SectionWrapper>
+        </SectionWrapper> */}
         <Bottom>
           <FeedbackContainer>
             <Feedback>{message}</Feedback>
