@@ -1,11 +1,12 @@
-import React, {useContext} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
+import React, {useContext} from 'react';
 import Home from './components/Home/Home';
-import Quiz from './components/Quiz/Quiz';
-import Profile from './components/Profile/Profile';
-import QuizLevel from './components/Quiz/components/QuizLevel';
 import Login from './components/Login/Login';
+import Profile from './components/Profile/Profile';
+import Quiz from './components/Quiz/Quiz';
+import QuizLevel from './components/Quiz/components/QuizLevel';
 import {AppContext} from '../../context/AppContext';
+
 const Stack = createStackNavigator();
 
 export default function HomeStack() {
@@ -16,7 +17,7 @@ export default function HomeStack() {
         screenOptions={{
           headerShown: false,
         }}
-        initialRouteName={isFinishedOnboarding ? 'Home' : 'AddName'}>
+        initialRouteName={isFinishedOnboarding ? 'Home' : 'Login'}>
         <>
           <Stack.Group>
             <Stack.Screen name="Login" component={Login} />
