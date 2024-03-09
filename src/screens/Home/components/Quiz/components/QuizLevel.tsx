@@ -1,20 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useContext, useEffect, useState} from 'react';
-import Layout from '../../../../../components/UI/Layout';
-import styled from 'styled-components/native';
-import {H1, H2, H3} from '../../../../../components/Typography/Headings';
-import {quizzes} from '../../../../../constants/quiz';
-import {ParagraphLarge} from '../../../../../components/Typography/Paragraph';
-import theme from '../../../../../constants/theme';
-import Button from '../../../../../components/UI/Button';
+import React, {useEffect, useState} from 'react';
 import {
   ArrowPathIcon,
   ArrowRightIcon,
   CheckCircleIcon,
   XCircleIcon,
 } from 'react-native-heroicons/outline';
-import {AppContext} from '../../../../../context/AppContext';
+import styled from 'styled-components/native';
+import {QuestionType} from 'typings/QuestionType';
 import {getQuestionsWithId} from '../../../../../actions/getQuestionsWithId';
+import {H1, H2, H3} from '../../../../../components/Typography/Headings';
+import {ParagraphLarge} from '../../../../../components/Typography/Paragraph';
+import Button from '../../../../../components/UI/Button';
+import Layout from '../../../../../components/UI/Layout';
+import theme from '../../../../../constants/theme';
 
 const LevelContainer = styled.View`
   gap: ${theme.spacing20};
@@ -96,16 +95,14 @@ export default function QuizLevel({route}: {route: any}) {
   console.log('level', level);
   const [userPoints, setUserPoints] = useState(0);
   const [message, setMessage] = useState('');
-  const [currentSection, setCurrentSection] = useState(0);
-  const [answeredQuestions, setAnsweredQuestions] = useState<{
-    [id: string]: boolean;
-  }>({});
+  const [currentSection, setCurrentSection] = useState(1);
+  const [answeredQuestions, setAnsweredQuestions] = useState<string[]>([]);
   const [shuffledAnswers, setShuffledAnswers] = useState<any[]>([]);
   const [replayLevel, setReplayLevel] = useState(false);
-  const [quiz, setQuiz] = useState<any>([]);
+  const [quiz, setQuiz] = useState<QuestionType[]>([]);
 
   useEffect(() => {
-    getQuestionsWithId(sport, level).then(data => {
+    getQuestionsWithId(sport, level, currentSection).then(data => {
       if (data) {
         setQuiz(data);
         console.log('Quiz:', data);
@@ -126,19 +123,19 @@ export default function QuizLevel({route}: {route: any}) {
   }
 
   const handleAnswer = (
-    isCorrect: boolean,
+    answer: string,
+    correctAnswer: string,
     points: number,
-    answerId: number,
   ) => {
     setAnsweredQuestions(prevState => {
-      // Add the answer ID and its correctness to answeredQuestions
-      const newAnsweredQuestions = {
-        ...prevState,
-        [answerId]: isCorrect,
-      };
+      // Add the answer to answeredQuestions
+      const newAnsweredQuestions = [...prevState, answer];
+
+      // Check if the correct answer is in the new answeredQuestions array
+      const isCorrect = newAnsweredQuestions.includes(correctAnswer);
 
       // Calculate the number of answered questions based on the new state value
-      const numAnsweredQuestions = Object.keys(newAnsweredQuestions).length;
+      const numAnsweredQuestions = newAnsweredQuestions.length;
       if (
         isCorrect &&
         (numAnsweredQuestions === 1 || numAnsweredQuestions === 2)
@@ -163,20 +160,31 @@ export default function QuizLevel({route}: {route: any}) {
   };
 
   useEffect(() => {
-    setAnsweredQuestions({});
-    setMessage('');
-    // setShuffledAnswers(
-    //   shuffleArray(
-    //     levelData?.sections[currentSection].questions[0].answers || [],
-    //   ),
-    // );
-  }, [currentSection]);
+    const processQuiz = (quizData: QuestionType[]) => {
+      quizData.forEach(question => {
+        const answers = [
+          'answer_a',
+          'answer_b',
+          'answer_c',
+          'answer_d',
+          'answer_e',
+        ]
+          .map(key => question[key as keyof QuestionType])
+          .filter(answer => answer !== null);
+
+        setShuffledAnswers(shuffleArray(answers));
+        console.log('Shuffled answers:', shuffledAnswers);
+      });
+    };
+
+    processQuiz(quiz);
+  }, [quiz]);
 
   const resetLevel = () => {
     setUserPoints(0);
     setCurrentSection(0);
     setReplayLevel(false);
-    setAnsweredQuestions({});
+    setAnsweredQuestions([]);
   };
 
   return (
@@ -191,34 +199,49 @@ export default function QuizLevel({route}: {route: any}) {
             </ReplayWrapper>
           )}
         </PointsWrapper>
-        {/* <SectionWrapper>
-          {levelData?.sections[currentSection].questions.map(
-            (question, questionIndex) => (
-              <React.Fragment key={questionIndex}>
-                <QuestionWrapper>
-                  <Question>{question.question}</Question>
-                </QuestionWrapper>
-                {shuffledAnswers.map((answer, answerIndex) => (
-                  <AnswerWrapper
-                    isCorrect={answeredQuestions[answer.id]}
-                    onPress={() => {
-                      handleAnswer(answer.isCorrect, answer.points, answer.id);
-                    }}
-                    key={answerIndex}>
-                    <Answer isCorrect={answeredQuestions[answer.id]}>
-                      {answer.answer}
-                    </Answer>
-                    {!answer.isCorrect ? (
-                      <XCircleIcon color={theme.greenBlack} size={25} />
-                    ) : answer.isCorrect ? (
-                      <CheckCircleIcon color={theme.greenBlack} size={25} />
-                    ) : null}
-                  </AnswerWrapper>
-                ))}
-              </React.Fragment>
-            ),
-          )}
-        </SectionWrapper> */}
+        <SectionWrapper>
+          {quiz.map((question, questionIndex) => (
+            <React.Fragment key={questionIndex}>
+              <QuestionWrapper>
+                <Question>{question.question_text}</Question>
+              </QuestionWrapper>
+              {shuffledAnswers.map((answer, answerIndex) => (
+                <AnswerWrapper
+                  isCorrect={
+                    answeredQuestions.includes(answer)
+                      ? answer === question.correct_answer
+                        ? true
+                        : false
+                      : undefined
+                  }
+                  onPress={() => {
+                    handleAnswer(
+                      answer,
+                      question.correct_answer,
+                      question.points,
+                    );
+                  }}
+                  key={answerIndex}>
+                  <Answer
+                    isCorrect={
+                      answeredQuestions.includes(answer)
+                        ? answer === question.correct_answer
+                          ? true
+                          : false
+                        : undefined
+                    }>
+                    {answer}
+                  </Answer>
+                  {!answeredQuestions.includes(question.correct_answer) ? (
+                    <XCircleIcon color={theme.greenBlack} size={25} />
+                  ) : answeredQuestions.includes(question.correct_answer) ? (
+                    <CheckCircleIcon color={theme.greenBlack} size={25} />
+                  ) : null}
+                </AnswerWrapper>
+              ))}
+            </React.Fragment>
+          ))}
+        </SectionWrapper>
         <Bottom>
           <FeedbackContainer>
             <Feedback>{message}</Feedback>
