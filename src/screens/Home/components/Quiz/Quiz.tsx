@@ -3,16 +3,14 @@ import {NavigationProp, useNavigation} from '@react-navigation/native';
 import React, {useContext, useEffect, useState} from 'react';
 import {LockClosedIcon} from 'react-native-heroicons/solid';
 import styled from 'styled-components/native';
+import {LevelType} from 'typings/LevelType';
 import {QuizLevelParamList} from 'typings/Navigation';
+import {getLevelsWithSportId} from '../../../../actions/getLevelsWithId';
+import {getUserProgress} from '../../../../actions/getUserProgress';
 import {H1, H3} from '../../../../components/Typography/Headings';
 import Layout from '../../../../components/UI/Layout';
 import theme from '../../../../constants/theme';
-import {getLevelsWithSportId} from '../../../../actions/getLevelsWithId';
 import {AppContext} from '../../../../context/AppContext';
-import {getUserProgress} from '../../../../actions/getUserProgress';
-import {LevelType} from 'typings/LevelType';
-import {updateUserProgress} from '../../../../actions/updateUserProgress';
-import {UserProgressType} from 'typings/UserProgressType';
 
 const QuizContainer = styled.View`
   gap: ${theme.spacing20};
@@ -45,7 +43,7 @@ const LockIcon = styled(LockClosedIcon)`
 
 export default function Quiz({route}: {route: any}) {
   const {id} = route.params;
-  const {levels, setLevels, sports, userProgress, setUserProgress, user} =
+  const {levels, setLevels, sports, setUserProgress, user} =
     useContext(AppContext);
   const navigation = useNavigation<NavigationProp<QuizLevelParamList>>();
   const quiz = sports?.find(sport => sport.sport_id === id);
@@ -71,11 +69,22 @@ export default function Quiz({route}: {route: any}) {
         if (data) {
           if (JSON.stringify(data) !== JSON.stringify(initialUserProgress)) {
             setUserProgress(data);
+            setCompletedLevels(data.map((level: any) => level.current_level));
           }
         }
       })
       .catch(error => {
         console.error('Error fetching user progress:', error);
+        // Handle error appropriately
+      });
+    getLevelsWithSportId(id)
+      .then(data => {
+        if (data) {
+          setLevels(data);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching levels:', error);
         // Handle error appropriately
       });
   }, []);
