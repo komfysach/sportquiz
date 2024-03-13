@@ -69,7 +69,10 @@ export default function Quiz({route}: {route: any}) {
         if (data) {
           if (JSON.stringify(data) !== JSON.stringify(initialUserProgress)) {
             setUserProgress(data);
-            setCompletedLevels(data.map((level: any) => level.current_level));
+            setCompletedLevels(prevLevels => [
+              ...prevLevels,
+              ...data.map((level: any) => level.current_level),
+            ]);
           }
         }
       })
