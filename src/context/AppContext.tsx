@@ -9,7 +9,7 @@ type AppContextType = {
   isFinishedOnboarding: boolean;
   setIsFinishedOnboarding: (isFinished: boolean) => void;
   user: PlayerDataType | null;
-  setUser: (user: PlayerDataType) => void;
+  setUser: (user: PlayerDataType | null) => void;
   userProgress: UserProgressType[] | null;
   setUserProgress: (userProgress: UserProgressType[]) => void;
   players: PlayerDataType[] | null;
@@ -22,7 +22,6 @@ type AppContextType = {
   setQuestions: (questions: QuestionType[]) => void;
 };
 
-// create a context here
 export const AppContext = createContext<AppContextType>({} as AppContextType);
 
 type AppProviderProps = {
