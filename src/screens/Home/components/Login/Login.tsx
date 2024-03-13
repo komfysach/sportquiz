@@ -64,6 +64,7 @@ export default function Login() {
   const [formData, setFormData] = useState({
     name: '',
     password: '',
+    token: '',
   });
   const navigation = useNavigation<NavigationProp<HomeParamList>>();
   const {setPlayers, setUser, players} = useContext(AppContext);
@@ -87,10 +88,13 @@ export default function Login() {
       const existingPlayer = players.find(
         player =>
           player.name === formData.name &&
-          player.password === formData.password,
+          player.password === formData.password &&
+          player.token === formData.token,
       );
 
       if (!existingPlayer) {
+        const newtoken = `${formData.name}:${formData.password}`;
+        formData.token = newtoken;
         console.log('Inserting player:', formData);
         await insertPlayer({playerData: formData});
         setUser(formData);
