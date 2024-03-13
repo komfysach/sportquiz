@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {NavigationContainer} from '@react-navigation/native';
 import React, {useContext, useEffect, useState} from 'react';
@@ -12,12 +13,12 @@ import {
   TrophyIcon as TrophyIconSolid,
 } from 'react-native-heroicons/solid';
 import styled from 'styled-components/native';
+import {getPlayerByToken} from '../actions/getPlayerByToken';
+import {getPlayers} from '../actions/getPlayers';
 import theme from '../constants/theme';
+import {AppContext} from '../context/AppContext';
 import HomeStack from '../screens/Home/HomeStack';
 import RankingsStack from '../screens/Rankings/Rankings';
-import {AppContext} from '../context/AppContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {getPlayerByToken} from '../actions/getPlayerByToken';
 
 const Tab = createBottomTabNavigator();
 const screenWidth = Dimensions.get('screen').width;
@@ -79,7 +80,8 @@ const Text = styled.Text<{focused?: Boolean}>`
 `;
 
 export default function Routes() {
-  const {user, setUser, setIsFinishedOnboarding} = useContext(AppContext);
+  const {user, setUser, setIsFinishedOnboarding, setPlayers} =
+    useContext(AppContext);
   const [loading, setLoading] = useState(true);
 
   const setToken = async (username?: string, password?: string) => {
@@ -112,10 +114,15 @@ export default function Routes() {
       setToken(user?.name, user?.password);
     }
     getToken();
+    getPlayers().then(data => {
+      if (data) {
+        setPlayers(data);
+      }
+    });
     setTimeout(() => {
       setLoading(false);
     }, 1000);
-  }, []);
+  }, [user]);
 
   return (
     <>
