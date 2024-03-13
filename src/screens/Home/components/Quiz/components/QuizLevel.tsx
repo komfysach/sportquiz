@@ -18,7 +18,6 @@ import Layout from '../../../../../components/UI/Layout';
 import theme from '../../../../../constants/theme';
 import {updateUserProgress} from '../../../../../actions/updateUserProgress';
 import {AppContext} from '../../../../../context/AppContext';
-import {updateScores} from '../../../../../actions/updateScores';
 
 const LevelContainer = styled.View`
   gap: ${theme.spacing20};
@@ -112,18 +111,25 @@ export default function QuizLevel({route}: {route: any}) {
 
   const navigation = useNavigation<NavigationProp<QuizParamList>>();
 
+  // update user progress when the component mounts
+  useEffect(() => {
+    updateUserProgress(sport, level, user?.id!, userPoints);
+  }, []);
+
+  // get the questions for the current section, if there are no questions left,
+  // update the user progress and navigate to the quiz screen
   useEffect(() => {
     getQuestionsWithId(sport, level, currentSection).then(data => {
       if (data && Object.keys(data).length > 0) {
         setQuiz(data);
       } else {
         updateUserProgress(sport, level + 1, user?.id!, userPoints);
-        updateScores(user?.id!, sport, userPoints);
         navigation.navigate('Quiz', {id: sport});
       }
     });
   }, [currentSection, navigation]);
 
+  // shuffle the answers, so they are displayed in a random order
   function shuffleArray(array: any[]) {
     const shuffledArray = [...array];
     for (let i = shuffledArray.length - 1; i > 0; i--) {
@@ -136,6 +142,7 @@ export default function QuizLevel({route}: {route: any}) {
     return shuffledArray;
   }
 
+  // handle the answer, check if the answer is correct and update the user points
   const handleAnswer = (
     answer: string,
     correctAnswer: string,
@@ -171,8 +178,14 @@ export default function QuizLevel({route}: {route: any}) {
       }
       return newAnsweredQuestions;
     });
+    console.log('answeredQuestions', answeredQuestions);
   };
 
+  useEffect(() => {
+    console.log('answeredQuestions', answeredQuestions);
+  }, [answeredQuestions]);
+
+  // process the quiz data and shuffle the answers
   useEffect(() => {
     const processQuiz = (quizData: QuestionType[]) => {
       quizData.forEach(question => {
@@ -187,13 +200,13 @@ export default function QuizLevel({route}: {route: any}) {
           .filter(answer => answer !== null);
 
         setShuffledAnswers(shuffleArray(answers));
-        console.log('Shuffled answers:', shuffledAnswers);
       });
     };
 
     processQuiz(quiz);
   }, [quiz]);
 
+  // reset the level
   const resetLevel = () => {
     setUserPoints(0);
     setCurrentSection(0);
@@ -270,6 +283,7 @@ export default function QuizLevel({route}: {route: any}) {
               onPress={() => {
                 setCurrentSection(currentSection + 1);
                 setAnsweredQuestions([]);
+                setMessage('');
               }}
               label="Next"
               icon={<ArrowRightIcon size={20} color={theme.greenBlack} />}
