@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useEffect, useState} from 'react';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import React, {useContext, useEffect, useState} from 'react';
 import {
   ArrowPathIcon,
   ArrowRightIcon,
@@ -7,6 +8,7 @@ import {
   XCircleIcon,
 } from 'react-native-heroicons/outline';
 import styled from 'styled-components/native';
+import {QuizParamList} from 'typings/Navigation';
 import {QuestionType} from 'typings/QuestionType';
 import {getQuestionsWithId} from '../../../../../actions/getQuestionsWithId';
 import {H1, H2, H3} from '../../../../../components/Typography/Headings';
@@ -14,6 +16,9 @@ import {ParagraphLarge} from '../../../../../components/Typography/Paragraph';
 import Button from '../../../../../components/UI/Button';
 import Layout from '../../../../../components/UI/Layout';
 import theme from '../../../../../constants/theme';
+import {updateUserProgress} from '../../../../../actions/updateUserProgress';
+import {AppContext} from '../../../../../context/AppContext';
+import {updateScores} from '../../../../../actions/updateScores';
 
 const LevelContainer = styled.View`
   gap: ${theme.spacing20};
@@ -39,6 +44,10 @@ const QuestionWrapper = styled.View`
 
 const Question = styled(H2)``;
 
+const AnswersContainer = styled.ScrollView`
+  max-height: 250px;
+`;
+
 const AnswerWrapper = styled.TouchableOpacity<{isCorrect?: Boolean}>`
   padding: ${theme.spacing15};
   background-color: ${({isCorrect}) =>
@@ -57,6 +66,7 @@ const AnswerWrapper = styled.TouchableOpacity<{isCorrect?: Boolean}>`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: ${theme.spacing10};
 `;
 
 const Answer = styled(ParagraphLarge)<{isCorrect?: Boolean}>`
@@ -91,8 +101,7 @@ const ReplayWrapper = styled.TouchableOpacity`
 
 export default function QuizLevel({route}: {route: any}) {
   const {sport, level} = route.params;
-  console.log('id', sport);
-  console.log('level', level);
+  const {user} = useContext(AppContext);
   const [userPoints, setUserPoints] = useState(0);
   const [message, setMessage] = useState('');
   const [currentSection, setCurrentSection] = useState(1);
@@ -101,14 +110,19 @@ export default function QuizLevel({route}: {route: any}) {
   const [replayLevel, setReplayLevel] = useState(false);
   const [quiz, setQuiz] = useState<QuestionType[]>([]);
 
+  const navigation = useNavigation<NavigationProp<QuizParamList>>();
+
   useEffect(() => {
     getQuestionsWithId(sport, level, currentSection).then(data => {
-      if (data) {
+      if (data && Object.keys(data).length > 0) {
         setQuiz(data);
-        console.log('Quiz:', data);
+      } else {
+        updateUserProgress(sport, level + 1, user?.id!, userPoints);
+        updateScores(user?.id!, sport, userPoints);
+        navigation.navigate('Quiz', {id: sport});
       }
     });
-  }, []);
+  }, [currentSection, navigation]);
 
   function shuffleArray(array: any[]) {
     const shuffledArray = [...array];
@@ -205,40 +219,44 @@ export default function QuizLevel({route}: {route: any}) {
               <QuestionWrapper>
                 <Question>{question.question_text}</Question>
               </QuestionWrapper>
-              {shuffledAnswers.map((answer, answerIndex) => (
-                <AnswerWrapper
-                  isCorrect={
-                    answeredQuestions.includes(answer)
-                      ? answer === question.correct_answer
-                        ? true
-                        : false
-                      : undefined
-                  }
-                  onPress={() => {
-                    handleAnswer(
-                      answer,
-                      question.correct_answer,
-                      question.points,
-                    );
-                  }}
-                  key={answerIndex}>
-                  <Answer
+              <AnswersContainer>
+                {shuffledAnswers.map((answer, answerIndex) => (
+                  <AnswerWrapper
                     isCorrect={
                       answeredQuestions.includes(answer)
                         ? answer === question.correct_answer
                           ? true
                           : false
                         : undefined
-                    }>
-                    {answer}
-                  </Answer>
-                  {!answeredQuestions.includes(question.correct_answer) ? (
-                    <XCircleIcon color={theme.greenBlack} size={25} />
-                  ) : answeredQuestions.includes(question.correct_answer) ? (
-                    <CheckCircleIcon color={theme.greenBlack} size={25} />
-                  ) : null}
-                </AnswerWrapper>
-              ))}
+                    }
+                    onPress={() => {
+                      handleAnswer(
+                        answer,
+                        question.correct_answer,
+                        question.points,
+                      );
+                    }}
+                    key={answerIndex}>
+                    <Answer
+                      isCorrect={
+                        answeredQuestions.includes(answer)
+                          ? answer === question.correct_answer
+                            ? true
+                            : false
+                          : undefined
+                      }>
+                      {answer}
+                    </Answer>
+                    {!answeredQuestions.includes(answer) ||
+                    answer !== question.correct_answer ? (
+                      <XCircleIcon color={theme.greenBlack} size={25} />
+                    ) : answeredQuestions.includes(answer) &&
+                      answer === question.correct_answer ? (
+                      <CheckCircleIcon color={theme.greenBlack} size={25} />
+                    ) : null}
+                  </AnswerWrapper>
+                ))}
+              </AnswersContainer>
             </React.Fragment>
           ))}
         </SectionWrapper>
@@ -251,6 +269,7 @@ export default function QuizLevel({route}: {route: any}) {
               inActive={replayLevel}
               onPress={() => {
                 setCurrentSection(currentSection + 1);
+                setAnsweredQuestions([]);
               }}
               label="Next"
               icon={<ArrowRightIcon size={20} color={theme.greenBlack} />}
