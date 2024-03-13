@@ -12,6 +12,7 @@ export type HomeParamList = {
   QuizLevel: QuizLevelParamList;
   Profile: undefined;
   AddName: undefined;
+  Login: undefined;
 };
 
 export type QuizParamList = {
