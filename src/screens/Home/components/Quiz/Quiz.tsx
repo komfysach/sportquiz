@@ -75,6 +75,9 @@ export default function Quiz({route}: {route: any}) {
             ]);
           }
         }
+        if (data?.length === 0) {
+          setUserProgress([initialUserProgress]);
+        }
       })
       .catch(error => {
         console.error('Error fetching user progress:', error);
