@@ -2,16 +2,16 @@
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import React, {useContext, useEffect} from 'react';
 import {Dimensions} from 'react-native';
-import {UserIcon} from 'react-native-heroicons/outline';
+import {ArrowRightEndOnRectangleIcon} from 'react-native-heroicons/outline';
 import styled from 'styled-components/native';
 import {HomeParamList} from 'typings/Navigation';
 import {getSports} from '../../../../actions/getSportCategories';
 import {H1, H2, H4} from '../../../../components/Typography/Headings';
 import Layout from '../../../../components/UI/Layout';
-import Search from '../../../../components/UI/Search';
 import theme from '../../../../constants/theme';
 import {AppContext} from '../../../../context/AppContext';
 import Category from './components/Category';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeContainer = styled.View`
   flex: 1;
@@ -60,7 +60,7 @@ const Categories = styled.View`
 
 export default function Home() {
   const navigation = useNavigation<NavigationProp<HomeParamList>>();
-  const {sports, setSports, user} = useContext(AppContext);
+  const {sports, setSports, user, setUser} = useContext(AppContext);
   useEffect(() => {
     getSports().then(data => {
       if (data) {
@@ -69,27 +69,39 @@ export default function Home() {
     });
   }, []);
 
-  const handleProfilePress = () => {
-    navigation.navigate('Profile');
+  const handleLogout = async () => {
+    try {
+      // Remove the token from AsyncStorage
+      await AsyncStorage.removeItem('token');
+      setUser(null);
+      navigation.navigate('Login');
+      // Rest of your logout logic...
+    } catch (error) {
+      console.error('Failed to remove the token from AsyncStorage:', error);
+    }
   };
+
   return (
     <Layout>
       <HomeContainer testID="home-screen">
         <Top>
           <Left>
-            <Intro>Hello</Intro>
+            <Intro>Hello,</Intro>
             <Name>{user?.name}</Name>
           </Left>
           <Right>
-            <ProfileWrapper onPress={handleProfilePress}>
-              <UserIcon size={30} color={theme.lightGreen} />
+            <ProfileWrapper onPress={handleLogout}>
+              <ArrowRightEndOnRectangleIcon
+                size={30}
+                color={theme.lightGreen}
+              />
             </ProfileWrapper>
           </Right>
         </Top>
         <QuestionWrapper>
           <Question>What sport trivia would you like to tackle today?</Question>
         </QuestionWrapper>
-        <Search />
+        {/* <Search /> */}
         <Categories>
           {sports?.map((category, id) => (
             <Category category={category} key={id} />
