@@ -11,6 +11,7 @@ import {H1, H3} from '../../../../components/Typography/Headings';
 import Layout from '../../../../components/UI/Layout';
 import theme from '../../../../constants/theme';
 import {AppContext} from '../../../../context/AppContext';
+import {UserProgressType} from 'typings/UserProgressType';
 
 const QuizContainer = styled.View`
   gap: ${theme.spacing20};
@@ -69,10 +70,23 @@ export default function Quiz({route}: {route: any}) {
         if (data) {
           if (JSON.stringify(data) !== JSON.stringify(initialUserProgress)) {
             setUserProgress(data);
-            setCompletedLevels(prevLevels => [
-              ...prevLevels,
-              ...data.map((level: any) => level.current_level),
-            ]);
+            setCompletedLevels(prevLevels => {
+              // Generate an array of arrays of completed levels for each item
+              const completedLevelsArray = data
+                .filter((item: UserProgressType) => item.sport_id === id) // Add this line
+                .map((item: UserProgressType) =>
+                  Array.from({length: item.current_level}, (_, i) => i + 1),
+                );
+
+              // Flatten the array of arrays into a single array of completed levels
+              const flattenedCompletedLevels: number[] = (
+                [] as number[]
+              ).concat(...completedLevelsArray);
+
+              // Merge the completed levels with the previous levels
+              return [...new Set([...prevLevels, ...flattenedCompletedLevels])];
+            });
+            console.log('completedLevels', completedLevels);
           }
         }
         if (data?.length === 0) {
