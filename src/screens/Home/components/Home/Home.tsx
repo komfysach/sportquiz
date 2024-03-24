@@ -61,6 +61,7 @@ const Categories = styled.View`
 export default function Home() {
   const navigation = useNavigation<NavigationProp<HomeParamList>>();
   const {sports, setSports, user, setUser} = useContext(AppContext);
+
   useEffect(() => {
     getSports().then(data => {
       if (data) {
@@ -69,13 +70,16 @@ export default function Home() {
     });
   }, []);
 
+  useEffect(() => {
+    if (user === null) {
+      navigation.navigate('Login');
+    }
+  }, [user]);
+
   const handleLogout = async () => {
     try {
-      // Remove the token from AsyncStorage
       await AsyncStorage.removeItem('token');
       setUser(null);
-      navigation.navigate('Login');
-      // Rest of your logout logic...
     } catch (error) {
       console.error('Failed to remove the token from AsyncStorage:', error);
     }
