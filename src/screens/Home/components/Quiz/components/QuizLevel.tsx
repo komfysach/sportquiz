@@ -11,12 +11,13 @@ import styled from 'styled-components/native';
 import {QuizParamList} from 'typings/Navigation';
 import {QuestionType} from 'typings/QuestionType';
 import {getQuestionsWithId} from '../../../../../actions/getQuestionsWithId';
-import {H1, H2, H3} from '../../../../../components/Typography/Headings';
+import {getUserProgress} from '../../../../../actions/getUserProgress';
+import {updateUserProgress} from '../../../../../actions/updateUserProgress';
+import {H1, H3} from '../../../../../components/Typography/Headings';
 import {ParagraphLarge} from '../../../../../components/Typography/Paragraph';
 import Button from '../../../../../components/UI/Button';
 import Layout from '../../../../../components/UI/Layout';
 import theme from '../../../../../constants/theme';
-import {updateUserProgress} from '../../../../../actions/updateUserProgress';
 import {AppContext} from '../../../../../context/AppContext';
 
 const LevelContainer = styled.View`
@@ -41,7 +42,7 @@ const QuestionWrapper = styled.View`
   margin-bottom: ${theme.spacing10};
 `;
 
-const Question = styled(H2)``;
+const Question = styled(ParagraphLarge)``;
 
 const AnswersContainer = styled.ScrollView`
   max-height: 250px;
@@ -107,13 +108,24 @@ export default function QuizLevel({route}: {route: any}) {
   const [answeredQuestions, setAnsweredQuestions] = useState<string[]>([]);
   const [shuffledAnswers, setShuffledAnswers] = useState<any[]>([]);
   const [replayLevel, setReplayLevel] = useState(false);
+  const [disableNext, setDisableNext] = useState(true);
   const [quiz, setQuiz] = useState<QuestionType[]>([]);
 
   const navigation = useNavigation<NavigationProp<QuizParamList>>();
 
   // update user progress when the component mounts
   useEffect(() => {
-    updateUserProgress(sport, level, user?.id!, userPoints);
+    // Fetch the current points for the user from the database.
+    const fetchCurrentPoints = async () => {
+      const currentProgress = await getUserProgress(user?.id!);
+      const currentPoints =
+        currentProgress
+          ?.map(progress => progress.points)
+          .reduce((acc, curr) => acc + curr, 0) || 0;
+      const newPoints = currentPoints + userPoints;
+      updateUserProgress(sport, level, user?.id!, newPoints);
+    };
+    fetchCurrentPoints();
   }, []);
 
   // get the questions for the current section, if there are no questions left,
@@ -123,8 +135,18 @@ export default function QuizLevel({route}: {route: any}) {
       if (data && Object.keys(data).length > 0) {
         setQuiz(data);
       } else {
-        updateUserProgress(sport, level + 1, user?.id!, userPoints);
-        navigation.navigate('Quiz', {id: sport});
+        // Fetch the current points for the user from the database.
+        const fetchCurrentPoints = async () => {
+          const currentProgress = await getUserProgress(user?.id!);
+          const currentPoints =
+            currentProgress
+              ?.map(progress => progress.points)
+              .reduce((acc, curr) => acc + curr, 0) || 0;
+          const newPoints = currentPoints + userPoints;
+          updateUserProgress(sport, level + 1, user?.id!, newPoints);
+          navigation.navigate('Quiz', {id: sport});
+        };
+        fetchCurrentPoints();
       }
     });
   }, [currentSection, navigation]);
@@ -211,8 +233,17 @@ export default function QuizLevel({route}: {route: any}) {
     setUserPoints(0);
     setCurrentSection(0);
     setReplayLevel(false);
+    setDisableNext(true);
     setAnsweredQuestions([]);
   };
+
+  useEffect(() => {
+    if (message === 'Well done! Keep going!') {
+      setDisableNext(false);
+    } else {
+      setDisableNext(true);
+    }
+  }, [message, replayLevel, currentSection]);
 
   return (
     <Layout backLink>
@@ -278,16 +309,18 @@ export default function QuizLevel({route}: {route: any}) {
             <Feedback>{message}</Feedback>
           </FeedbackContainer>
           <ButtonContainer>
-            <Button
-              inActive={replayLevel}
-              onPress={() => {
-                setCurrentSection(currentSection + 1);
-                setAnsweredQuestions([]);
-                setMessage('');
-              }}
-              label="Next"
-              icon={<ArrowRightIcon size={20} color={theme.greenBlack} />}
-            />
+            {disableNext ? null : (
+              <Button
+                inActive={replayLevel}
+                onPress={() => {
+                  setCurrentSection(currentSection + 1);
+                  setAnsweredQuestions([]);
+                  setMessage('');
+                }}
+                label="Next"
+                icon={<ArrowRightIcon size={20} color={theme.greenBlack} />}
+              />
+            )}
           </ButtonContainer>
         </Bottom>
       </LevelContainer>
