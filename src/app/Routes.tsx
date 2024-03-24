@@ -18,7 +18,7 @@ import {getPlayers} from '../actions/getPlayers';
 import theme from '../constants/theme';
 import {AppContext} from '../context/AppContext';
 import HomeStack from '../screens/Home/HomeStack';
-import RankingsStack from '../screens/Rankings/Rankings';
+import RankingsStack from '../screens/Rankings/components/Rankings';
 
 const Tab = createBottomTabNavigator();
 const screenWidth = Dimensions.get('screen').width;
@@ -80,24 +80,14 @@ const Text = styled.Text<{focused?: Boolean}>`
 `;
 
 export default function Routes() {
-  const {user, setUser, setIsFinishedOnboarding, setPlayers} =
-    useContext(AppContext);
+  const {setUser, setIsFinishedLoggingIn, setPlayers} = useContext(AppContext);
   const [loading, setLoading] = useState(true);
 
-  const setToken = async (username?: string, password?: string) => {
-    const token = `${username}:${password}`;
+  const checkToken = async () => {
     try {
-      await AsyncStorage.setItem('@storage_Key', token);
-    } catch (e) {
-      console.error('Error storing token:', e);
-    }
-  };
-
-  const getToken = async () => {
-    try {
-      const value = await AsyncStorage.getItem('@storage_Key');
+      const value = await AsyncStorage.getItem('token');
       if (value !== null) {
-        setIsFinishedOnboarding(true);
+        setIsFinishedLoggingIn(true);
         getPlayerByToken(value).then(data => {
           if (data) {
             setUser(data);
@@ -110,10 +100,7 @@ export default function Routes() {
   };
 
   useEffect(() => {
-    if (user !== null) {
-      setToken(user?.name, user?.password);
-    }
-    getToken();
+    checkToken();
     getPlayers().then(data => {
       if (data) {
         setPlayers(data);
@@ -122,7 +109,7 @@ export default function Routes() {
     setTimeout(() => {
       setLoading(false);
     }, 1000);
-  }, [user]);
+  }, []);
 
   return (
     <>
