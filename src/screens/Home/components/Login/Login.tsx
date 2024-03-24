@@ -12,6 +12,7 @@ import {ParagraphSmall} from '../../../../components/Typography/Paragraph';
 import {insertPlayer} from '../../../../actions/insertPlayer';
 import {getPlayers} from '../../../../actions/getPlayers';
 import {AppContext} from '../../../../context/AppContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const NameInputContainer = styled.View`
   flex: 1;
@@ -67,16 +68,21 @@ export default function Login() {
     token: '',
   });
   const navigation = useNavigation<NavigationProp<HomeParamList>>();
-  const {setPlayers, setUser, players} = useContext(AppContext);
+  const {setPlayers, setUser, players, user} = useContext(AppContext);
 
   useEffect(() => {
     getPlayers().then(data => {
       if (data) {
         setPlayers(data);
-        console.log('Players:', data);
       }
     });
   }, []);
+
+  useEffect(() => {
+    if (user !== null) {
+      navigation.navigate('Home');
+    }
+  }, [user]);
 
   const login = async () => {
     try {
@@ -89,23 +95,23 @@ export default function Login() {
         player =>
           player.name === formData.name &&
           player.password === formData.password &&
-          player.token === formData.token,
+          player.token === `${formData.name}:${formData.password}`,
       );
 
       if (!existingPlayer) {
         const newtoken = `${formData.name}:${formData.password}`;
         formData.token = newtoken;
-        console.log('Inserting player:', formData);
+        // console.log('Inserting player:', formData);
         await insertPlayer({playerData: formData});
         setUser(formData);
       } else {
-        console.log('Existing player:', existingPlayer);
+        // console.log('Existing player:', existingPlayer);
+        AsyncStorage.setItem('token', existingPlayer?.token!);
         setUser(existingPlayer);
       }
-
       navigation.navigate('Home');
     } catch (error) {
-      console.error('Unexpected error:', error);
+      // console.error('Unexpected error:', error);
       // Handle unexpected errors
     }
   };
