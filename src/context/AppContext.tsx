@@ -6,8 +6,8 @@ import {QuestionType} from 'typings/QuestionType';
 import {UserProgressType} from 'typings/UserProgressType';
 
 type AppContextType = {
-  isFinishedOnboarding: boolean;
-  setIsFinishedOnboarding: (isFinished: boolean) => void;
+  isFinishedLoggingIn: boolean;
+  setIsFinishedLoggingIn: (isFinished: boolean) => void;
   user: PlayerDataType | null;
   setUser: (user: PlayerDataType | null) => void;
   userProgress: UserProgressType[] | null;
@@ -29,7 +29,7 @@ type AppProviderProps = {
 };
 
 export function AppProvider({children}: AppProviderProps) {
-  const [isFinishedOnboarding, setIsFinishedOnboarding] = useState(false);
+  const [isFinishedLoggingIn, setIsFinishedLoggingIn] = useState(false);
   const [user, setUser] = useState<PlayerDataType | null>(null);
   const [sports, setSports] = useState<CategoryType[] | null>(null);
   const [levels, setLevels] = useState<LevelType[] | null>(null);
@@ -42,8 +42,8 @@ export function AppProvider({children}: AppProviderProps) {
   return (
     <AppContext.Provider
       value={{
-        isFinishedOnboarding,
-        setIsFinishedOnboarding,
+        isFinishedLoggingIn,
+        setIsFinishedLoggingIn,
         user,
         setUser,
         sports,
