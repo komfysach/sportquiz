@@ -1,4 +1,7 @@
 /* eslint-disable no-undef */
+jest.mock('react-native-url-polyfill/auto');
+jest.mock('@supabase/supabase-js');
+jest.mock('@env');
 jest.mock('react-native-gesture-handler', () => {
   const View = require('react-native/Libraries/Components/View/View');
   return {
