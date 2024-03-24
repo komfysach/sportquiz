@@ -4,13 +4,13 @@ import styled from 'styled-components/native';
 import {CategoryType} from 'typings/CategoryType';
 import {PlayerDataType} from 'typings/PlayerDataType';
 import {RankingsDataType} from 'typings/RankingsType';
-import {H1, H2, H3} from '../../components/Typography/Headings';
-import Layout from '../../components/UI/Layout';
-import theme from '../../constants/theme';
-import {AppContext} from '../../context/AppContext';
+import {H1, H2, H3} from '../../../components/Typography/Headings';
+import Layout from '../../../components/UI/Layout';
+import theme from '../../../constants/theme';
+import {AppContext} from '../../../context/AppContext';
 import {TrophyIcon} from 'react-native-heroicons/outline';
 import {UserProgressType} from 'typings/UserProgressType';
-import {getAllUserProgress} from '../../actions/getAllUserProgress';
+import {getAllUserProgress} from '../../../actions/getAllUserProgress';
 import {Text} from 'react-native-svg';
 
 const RankingContainer = styled.View`
@@ -110,6 +110,7 @@ export default function RankingsStack() {
       };
     });
   }
+
   useEffect(() => {
     getAllUserProgress().then(res => {
       const pointsData = res?.map((userProgress: UserProgressType) => {
@@ -124,6 +125,7 @@ export default function RankingsStack() {
     if (points && players && sports) {
       setRankings(rankingsCalculation(points, players, sports));
     }
+    console.log('rankings', rankings);
     setTimeout(() => {
       setLoading(false);
     }, 1000);
